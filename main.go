@@ -2,11 +2,19 @@ package main
 
 import (
 	"fmt"
-	// "io/ioutil"
-	// "log"
-	// "net/http"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"strings"
+	"encoding/json"
 )
+
+// define each post
+type post struct {
+	Title string
+	Author string
+	Url string
+}
 
 func main() {
 	printIntro()
@@ -62,9 +70,37 @@ func tryAgain() bool {
 	fmt.Println("Not cool. I specifically told you not to " +
 	"leave both fields blank.")
 
-	var again string
 	fmt.Print("Do you want to try again? y/n ")
-	fmt.Scanln(&again)
+	userAnswer := getInput()
 
-	return strings.ToLower(again) == "y"
+	return strings.ToLower(userAnswer) == "y"
+}
+
+func httpReq(username string, keyword string) []post {
+	url := fmt.Sprintf("www.url.com?username=%s&keyword=%s", username, keyword)
+	res, err := http.Get(url)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return decodeJson(body)
+}
+
+func decodeJson(body []byte) []post {
+	var posts []post
+
+	err := json.Unmarshal(body, &posts)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return posts
 }

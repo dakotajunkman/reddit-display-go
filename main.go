@@ -16,6 +16,11 @@ type post struct {
 	Url string
 }
 
+// JSON is returned as data pointing to a slice of posts
+type data struct {
+	Data []post
+}
+
 func main() {
 	printIntro()
 	usernamePrompt()
@@ -49,8 +54,8 @@ func main() {
 // introduce program
 func printIntro() {
 	fmt.Println("This neat program allows you to filter posts to the r/OSUOnlineCS subreddit by " +
-	"username or keyword, just like you've always wanted. You must enter at least one search " +
-	"parameter, but can do both if you want. If you enter none you will get in trouble and have " +
+	"username or keyword, just like you've always wanted.\n You must enter at least one search " +
+	"parameter, but can do both if you want.\n If you enter none you will get in trouble and have " +
 	"to do it again. To skip a parameter, simply hit Enter.")
 }
 

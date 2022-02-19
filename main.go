@@ -12,7 +12,7 @@ import (
 // define each post
 type post struct {
 	Title string
-	Author string
+	Username string
 	Url string
 }
 
@@ -43,8 +43,8 @@ func main() {
 		return
 	}
 
-	posts := decodeJson([]byte {})
-	displayPosts(posts)
+	data := httpReq(username, keyword)
+	displayPosts(data.Data)
 
 	if tryAgain() {
 		main()  // no need to stop since this is last line of function
@@ -61,7 +61,7 @@ func printIntro() {
 
 // ask for username
 func usernamePrompt() {
-	fmt.Print("Username (Press Enter to submit): ")
+	fmt.Print("Username (can be skipped) (Press Enter to submit): ")
 }
 
 // get input from user and strip off whitespace
@@ -99,8 +99,8 @@ func tryAgain() bool {
 }
 
 // call Reddit scraper and extract response body
-func httpReq(username string, keyword string) []post {
-	url := fmt.Sprintf("www.url.com?username=%s&keyword=%s", username, keyword)
+func httpReq(username string, keyword string) data {
+	url := fmt.Sprintf("https://parser-service-361.herokuapp.com/reddit/get?username=%s&keyword=%s", username, keyword)
 	res, err := http.Get(url)
 
 	if err != nil {
@@ -117,23 +117,22 @@ func httpReq(username string, keyword string) []post {
 }
 
 // unpack the JSON into a slice of structs
-func decodeJson(body []byte) []post {
-	var posts []post
-	posts = append(posts, post{Title: "Dummy Post", Author: "u/dummyauthor", Url: "dummypost.com"})
+func decodeJson(body []byte) data {
+	var data data
 
 	// unmarshal will error on an empty byte array
 	if len(body) == 0 {
-		return posts
+		return data
 	}
 
 	// unpack the JSON into a slice of structs
-	err := json.Unmarshal(body, &posts)
+	err := json.Unmarshal(body, &data)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return posts
+	return data
 }
 
 // show posts to the user
@@ -145,7 +144,7 @@ func displayPosts(posts []post) {
 		fmt.Printf("\nYour search yielded %d result(s).\n", len(posts))
 		for _, post := range posts {
 			fmt.Printf("Title: %s\n", post.Title)
-			fmt.Printf("Author: %s\n", post.Author)
+			fmt.Printf("Username: %s\n", post.Username)
 			fmt.Printf("URL: %s\n\n", post.Url)
 		}
 	}
